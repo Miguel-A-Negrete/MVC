@@ -1,4 +1,6 @@
 <?php
+include_once '../conexion/DB.php';
+
 class UserModel {
     private $pdo;
 
