@@ -1,8 +1,14 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Headers: X-Requested-With');
 
 require_once './modelos/UsersModel.php';
 require_once './controladores/UsersController.php';
+require_once './conexion/DB.php';
+include_once './views/view.php';
 
+$con = DB::getInstance(); // Inicializar la conexión
 $userController = new UserController(new UserModel($con));
 $method = $_SERVER['REQUEST_METHOD'];
 $inputJSON = file_get_contents('php://input');
@@ -15,11 +21,11 @@ switch ($method) {
             // Obtener un usuario por ID
             $userId = $_GET['id_user'];
             $user = $userController->getUserByID($userId);
-            echo json_encode($user);
+            View::returnJSON($user);
         } else {
             // Obtener todos los usuarios
             $users = $userController->getAllUsers();
-            echo json_encode($users);
+            View::returnJSON($users);
         }
         break;
     case 'POST':
