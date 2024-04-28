@@ -3,8 +3,7 @@
 require_once './modelos/UsersModel.php';
 require_once './controladores/UsersController.php';
 
-$pdo = new PDO('mysql:host=localhost;dbname=actasdigitales', 'root', '');
-$userController = new UserController(new UserModel($pdo));
+$userController = new UserController(new UserModel($con));
 $method = $_SERVER['REQUEST_METHOD'];
 $inputJSON = file_get_contents('php://input');
 $input = json_decode($inputJSON, true);
