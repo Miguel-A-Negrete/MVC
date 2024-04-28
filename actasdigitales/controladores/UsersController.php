@@ -6,19 +6,20 @@ class UserController {
         $this->userModel = $userModel;
     }
 
-    public function createUser($name, $email, $rol, $password) {
-        return $this->userModel->createUser($name, $email, $rol, $password);
+    public function createUser($id,$name, $email, $role, $password) {
+        return $this->userModel->createUser($id,$name, $email, $role, $password);
     }
 
     public function getAllUsers() {
-        return $this->userModel->getAllUsers();
+    return $this->userModel->getAllUsers();
     }
+
     public function getUserByID($id) {
-        return $this->userModel->getUserByUsername($id);
+        return $this->userModel->getUserByID($id);
     }
 
     public function updateUser($id, $name, $email, $role, $password) {
-        return $this->userModel->updateUserPassword($id, $name, $email, $role, $password);
+        return $this->userModel->updateUser($id, $name, $email, $role, $password);
     }
 
     public function deleteUser($id) {
