@@ -6,22 +6,22 @@ class UserModel {
         $this->pdo = $pdo;
     }
 
-    public function createUser($name, $email, $rol, $password) {
+    public function createUser($id, $name, $email, $role, $password) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $query = "INSERT INTO usuarios (name, email, rol, password_hash) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO users (id_user,name, email, rol, password_hash) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$name, $email, $rol, $hashedPassword]);
+        $stmt->execute([$id, $name, $email, $role, $hashedPassword]);
         return $stmt->rowCount(); 
     }
     
     public function getAllUsers() {
-        $query = "SELECT id_user, name, email, rol FROM users";
+        $query = "SELECT id_user, name, email, rol,password_hash FROM users";
         $stmt = $this->pdo->query($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getUserByID($id) {
-        $query = "SELECT * FROM usuarios WHERE id_user = ?";
+        $query = "SELECT id_user, name, email, rol,password_hash FROM users WHERE id_user = ?";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC); 
@@ -30,7 +30,7 @@ class UserModel {
     public function updateUser($id, $name, $email, $role, $password) {
         $hashedPassword = ($password != null) ? password_hash($password, PASSWORD_BCRYPT) : null;
 
-        $query = "UPDATE usuarios SET name = ?, email = ?, rol = ?";
+        $query = "UPDATE users SET name = ?, email = ?, rol = ?";
         $params = [$name, $email, $role];
 
         if ($hashedPassword != null) {
@@ -47,7 +47,7 @@ class UserModel {
     }
 
     public function deleteUser($id) {
-        $query = "DELETE FROM usuarios WHERE id_user = ?";
+        $query = "DELETE FROM users WHERE id_user = ?";
         $stmt = $this->pdo->prepare($query);
         $stmt->execute([$id]);
         return $stmt->rowCount(); 
