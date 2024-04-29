@@ -1,8 +1,7 @@
 <?php
-include_once '../conexion/DB.php';
-
 class UserModel {
     private $pdo;
+    private $tableName = 'users';
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
@@ -28,6 +27,26 @@ class UserModel {
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC); 
     }
+
+    public function getUserApprobation($email, $password) {
+        // Consulta solo el hash de la contraseña asociado con el correo electrónico
+        $query = "SELECT password_hash FROM {$this->tableName} WHERE email = ?";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$email]);
+        
+        // Verifica si el correo electrónico existe
+        if ($stmt->rowCount() > 0) {
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Usa password_verify para comparar la contraseña proporcionada con el hash almacenado
+            if (password_verify($password, $user['password_hash'])) {
+                return true; // Las credenciales son válidas
+            }
+        }
+    
+        return false; // Las credenciales son inválidas
+    }
+    
 
     public function updateUser($id, $name, $email, $role, $password) {
         $hashedPassword = ($password != null) ? password_hash($password, PASSWORD_BCRYPT) : null;
