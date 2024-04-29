@@ -6,8 +6,8 @@ class RecordController {
         $this->recordModel = $recordModel;
     }
 
-    public function createRecord($id_record, $date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record) {
-        return $this->recordModel->createRecord($id_record, $date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record);
+    public function createRecord($date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record) {
+        return $this->recordModel->createRecord($date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record);
     }
 
     public function getAllRecords() {
