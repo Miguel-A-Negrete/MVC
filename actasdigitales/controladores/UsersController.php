@@ -18,6 +18,10 @@ class UserController {
         return $this->userModel->getUserByID($id);
     }
 
+    public function getUserApprobation($email, $password){
+        return $this->userModel->getUserApprobation($email, $password);
+    }
+
     public function updateUser($id, $name, $email, $role, $password) {
         return $this->userModel->updateUser($id, $name, $email, $role, $password);
     }
