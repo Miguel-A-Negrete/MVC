@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", "sans-serif";
+}
+
+body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #1c0021;
+}
+
+.container{
+    position: relative;
+    max-width: 700px;
+    width: 100%;
+    background: #1c3166;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #240047;
+}
+
+.container header{
+    font-size: 1.5rem;
+    color: aliceblue;
+    font-weight: 500;
+    text-align: center;
+}
+
+.container .form{
+    margin-top: 30px;
+}
+
+.form .input-box{
+    width: 100%;
+    margin-top: 20px;
+}
+
+.input-box label{
+    color: aliceblue;
+    font-size: 1rem;
+}
+
+.form :where(.input-box input, .select-box){
+    position: relative;
+    height: 25px;
+    width: 100%;
+    outline: none;
+    font-size: 1rem;
+    color: black;
+    margin-top: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0 15px;
+}
+
+.input-box input:focus{
+    box-shadow: 0 1px 0 #240047;
+}
+
+.select-box select{
+    height: 100%;
+    width: 100%;
+    outline: none;
+    border: none;
+    color: black;
+    font-size: 1rem;
+}
+
+.form button{
+    height: 55px;
+    width: 100%;
+    color: aliceblue;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #240047;
+}
+
+p{
+    margin-top: 15px;
+    color: aliceblue;
+}
+
+a{
+    color: aliceblue;
+}
