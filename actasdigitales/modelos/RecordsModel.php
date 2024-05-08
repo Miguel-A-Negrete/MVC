@@ -1,5 +1,4 @@
 <?php
-include_once '../conexion/DB.php';
 class RecordModel {
     private $pdo;
     private $tableName = 'records';
