@@ -1,5 +1,4 @@
 <?php
-include_once '../conexion/DB.php';
 class RecordModel {
     private $pdo;
     private $tableName = 'records';
@@ -8,10 +7,10 @@ class RecordModel {
         $this->pdo = $pdo;
     }
 
-    public function createRecord($id_record, $date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record) {
-        $query = "INSERT INTO {$this->tableName} (id_record, date_record, start_time, end_time, affair, responsible, privacy, relationship_record) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public function createRecord($date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record) {
+        $query = "INSERT INTO {$this->tableName} (date_record, start_time, end_time, affair, responsible, privacy, relationship_record) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$id_record, $date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record]);
+        $stmt->execute([$date_record, $start_time, $end_time, $affair, $responsible, $privacy, $relationship_record]);
         return $stmt->rowCount(); 
     }
     
