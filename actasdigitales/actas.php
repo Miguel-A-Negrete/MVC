@@ -12,16 +12,141 @@ if (isset($_SESSION['email'])) {
 
     <head>
         <meta charset="UTF-8">
-        <title>Gestión de Actas</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+        <link rel="stylesheet" href="./CSS/style.css">
+        <link rel="stylesheet" href="./CSS/normalize.css">
     </head>
-
     <body>
-        <div class="container mt-5">
-            <h1>Gestión de Actas</h1>
+        <div class="grid-container">
 
-            <!-- Formulario para agregar una nueva acta -->
+            <header class="header">
+                <div class="menu-icon" onclick="openSidebar()">
+                    <span class="material-icons-outlined">menu</span>
+                </div>
+                <div></div>
+                <div class="header-right">
+                    <span class="material-icons-outlined">notifications</span>
+                    <span class="material-icons-outlined">email</span>
+                    <span class="material-icons-outlined">account_circle</span>
+                    </div>
+            </header>
+            <aside id="sidebar">
+                <div class="sidebar-title">
+                    <div class="sidebar-brand">
+                        <span class="material-icons-outlined"></span> Sistemas
+                    </div>
+                    <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+                </div>
+
+                <ul class="sidebar-list">
+                    <li class="sidebar-list-item">
+                        <a href="#" target="_blank">
+                            <span class="material-icons-outlined">dashboard</span> Panel
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="#" target="_blank">
+                            <span class="material-icons-outlined">poll</span> Resumen
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="#" target="_blank">
+                            <span class="material-icons-outlined">groups</span> Usuarios
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="#" target="_blank">
+                            <span class="material-icons-outlined">fact_check</span> Actas
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="#" target="_blank">
+                            <span class="material-icons-outlined">camera</span> Reuniones
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="#" target="_blank">
+                            <span class="material-icons-outlined">settings</span> Configuracion
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            <main class="main-container">
+                <div class="main-tittle">
+                    <h2>PANEL</h2>
+                </div>
+
+                <div class="main-cards">
+
+                <div class="card">
+                    <div class="card-inner">
+                        <h3>ACTAS</h3>
+                        <span class="material-icons-outlined">fact_check</span>
+                    </div>
+                    <?php
+                    $actas = $recordController->getAllRecords(); 
+                    $tamano = count($actas);
+                    echo "<h1>".$tamano."</h1>";
+                    ?>
+                </div>
+
+                <div class="card">
+                    <div class="card-inner">
+                        <h3>REUNIONES</h3>
+                        <span class="material-icons-outlined">camera</span>
+                    </div>
+                    <?php
+                    $actas = $recordController->getAllRecords(); 
+                    $tamano = count($actas);
+                    echo "<h1>".$tamano."</h1>";
+                    ?>
+                </div>
+
+                <div class="card">
+                    <div class="card-inner">
+                        <h3>USUARIOS</h3>
+                        <span class="material-icons-outlined">groups</span>
+                    </div>
+                    <?php
+                    $actas = $recordController->getAllRecords(); 
+                    $tamano = count($actas);
+                    echo "<h1>".$tamano."</h1>";
+                    ?>
+                </div>
+
+                <div class="card">
+                    <div class="card-inner">
+                        <h3>ALERTAS</h3>
+                        <span class="material-icons-outlined">notifications</span>
+                    </div>
+                    <?php
+                    $actas = $recordController->getAllRecords(); 
+                    $tamano = count($actas);
+                    echo "<h1>".$tamano."</h1>";
+                    ?>
+                </div>
+
+                </div>
+
+                <div class="charts">
+
+                    <div class="charts-card">
+                        <h2 class="charts-title">Las 5 mejores actas</h2>
+                        <div id="bar-chart"></div>
+                    </div>
+
+                    <div class="charts-card">
+                        <h2 class="charts-title">Participantes por reunion</h2>
+                        <div id="area-chart"></div>
+                    </div>
+
+                </div>
+            </main>
+            </div>
+            <!-- <h1>Gestión de Actas</h1>
+
+             Formulario para agregar una nueva acta
             <h2>Agregar Acta</h2>
             <form id="agregar-acta-form">
                 <div class="form-group">
@@ -51,7 +176,7 @@ if (isset($_SESSION['email'])) {
                         <option value="Privada">Privada</option>
                     </select>
                 </div>
-                <!-- Campo para establecer la relación entre actas -->
+                 Campo para establecer la relación entre actas 
                 <div class="form-group">
                     <label para="relacion_acta">Relacionar con Acta:</label>
                     <select id="relacion_acta" name="relacion_acta" class="form-control">
@@ -68,7 +193,7 @@ if (isset($_SESSION['email'])) {
                 <button type="submit" class="btn btn-primary">Agregar Acta</button>
             </form>
 
-            <!-- Área para mostrar las actas existentes -->
+             Área para mostrar las actas existentes
             <div class="container mt-5">
                 <h1>Lista de Actas</h1>
 
@@ -104,7 +229,7 @@ if (isset($_SESSION['email'])) {
                         </tbody>
                     </table>
                 <?php } ?>
-            </div>
+            </div> -->
 
             <!-- JavaScript para manejar formularios y solicitudes AJAX -->
             <script>
@@ -129,6 +254,10 @@ if (isset($_SESSION['email'])) {
                 });
             </script>
         </div>
+
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.5/apexcharts.min.js"></script>
+        <script src="scripts.js"></script>
     </body>
 
     </html>
