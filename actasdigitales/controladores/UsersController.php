@@ -60,7 +60,7 @@ class UserController {
             if ($result) {
                 session_start();
                 $_SESSION['email'] = $username;
-                return ['success' => true, 'redirect' => 'actas.php'];
+                header("Location: actas.php");
             } else {
                 return ['error' => 'Credenciales inválidas.'];
             }
