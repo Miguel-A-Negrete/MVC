@@ -61,7 +61,7 @@ if (isset($_SESSION['email'])) {
                         </a>
                     </li>
                     <li class="sidebar-list-item">
-                        <a href="#" target="_blank">
+                        <a href="reuniones.php">
                             <span class="material-icons-outlined">camera</span> Reuniones
                         </a>
                     </li>
