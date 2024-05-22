@@ -14,9 +14,25 @@ include_once './views/view.php';
 
 $con = DB::getInstance(); 
 
-$userController = new UserController(new UserModel($con));
-$recordController = new RecordController(new RecordModel($con));
-$meetingController = new MeetingController(new MeetingModel($con));
+function createControllers($con, $controllers) {
+    $instances = [];
+    foreach ($controllers as $controller) {
+        $modelClass = $controller . 'Model';
+        $controllerClass = $controller . 'Controller';
+        
+        if (class_exists($modelClass) && class_exists($controllerClass)) {
+            $model = new $modelClass($con);
+            $instances[$controller] = new $controllerClass($model);
+        } else {
+            throw new Exception("Classes for $controller do not exist.");
+        }
+    }
+    return $instances;
+}
+
+
+$controllerNames = ['User', 'Record', 'Meeting'];
+$controllers = createControllers($con, $controllerNames);
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
@@ -24,13 +40,13 @@ $route = $_GET['route'] ?? '';
 
 switch ($route) {
     case 'users':
-        $response = $userController->handleRequest($requestMethod);
+        $response = $controllers['User']->handleRequest($requestMethod);
         break;
     case 'records':
-        $response = $recordController->handleRequest($requestMethod);
+        $response = $controllers['Record']->handleRequest($requestMethod);
         break;
     case 'meetings':
-        $response = $meetingController->handleRequest($requestMethod);
+        $response = $controllers['Meeting']->handleRequest($requestMethod);
         break;
     default:
         $response = ['error' => 'Ruta no válida'];
