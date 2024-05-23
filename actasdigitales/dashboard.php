@@ -1,17 +1,30 @@
 <?php
 include_once './conexion/DB.php';
+include_once './conexion/Jwt.php';
 include_once './controladores/RecordsController.php';
 include_once './modelos/RecordsModel.php';
 include_once './controladores/MeetingsController.php';
 include_once './modelos/MeetingsModel.php';
 include_once './controladores/UsersController.php';
 include_once './modelos/UsersModel.php';
+
 session_start();
-if (isset($_SESSION['email'])) {
+
+if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+    $token = $_SESSION['token'];
+    $JwtController = new Jwt(Config::SECRET_KEY);
+
+    try {
+        $payload = $JwtController->decode($token);
+    } catch (Exception $e) {
+        header("Location: home.html");
+        exit();
+    }
+
     $con = DB::getInstance();
     $recordController = new RecordController(new RecordModel($con));
     $meetingController = new MeetingController(new MeetingModel($con));
-    $userController = new UserController(new UserModel($con));
+    $userController = new UserController(new UserModel($con)); 
     ?>
     <!DOCTYPE html>
     <html lang="es">
