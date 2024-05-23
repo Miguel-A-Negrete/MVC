@@ -1,0 +1,29 @@
+body{
+    display: flex;
+    padding: 40px;
+    justify-content: center;
+    align-items: center;
+    background-color: azure;
+}
+
+.container{
+    background-color: #fff;
+}
+
+.container header,
+.container label,
+.container p,
+.container a{
+    color: #000;
+}
+
+.container button{
+    background-color: #a7e245;
+    border-radius: 20px;
+    color: #fefefe;
+}
+
+.container input{
+    width: 95%;
+    padding: 20px;
+}
