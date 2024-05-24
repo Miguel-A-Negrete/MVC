@@ -76,7 +76,7 @@ class UserController {
                 session_start();
                 $_SESSION['email'] = $username;
                 $_SESSION['token'] = $token;
-                header('Location: ./dashboard.php);
+                header('Location: ./dashboard.php');
             } else {
                 return ['error' => 'Credenciales inválidas.'];
             }
