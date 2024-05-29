@@ -10,7 +10,7 @@
 <body>
     <section class="container">
         <header>Iniciar sesión</header>
-        <form id="loginForm" class="form">
+        <form id="loginForm" class="form" method="post" action="index.php?route=users">
             <div class="input-box">
                 <label for="username">Nombre de usuario</label>
                 <input name="username" id="username" type="text" placeholder="Ingresa tu correo electronico" required>
@@ -25,32 +25,5 @@
         </form>
         <p>¿No tienes cuenta? <a href="register.html">registrate aquí</a></p>
     </section>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            fetch('index.php?route=users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                    window.location.href = 'dashboard.php';
-                } else {
-                    alert('Credenciales inválidas');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
 </body>
 </html>

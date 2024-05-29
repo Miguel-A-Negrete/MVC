@@ -43,10 +43,9 @@ class UserController {
         $userId = isset($_POST['id_user']) ? $_POST['id_user'] : null;
         $name = isset($_POST['name']) ? $_POST['name'] : null;
         $role = isset($_POST['rol']) ? $_POST['rol'] : null;
+        $username = isset($_POST['username']) ? $_POST['username'] : null;
+        $password = isset($_POST['password']) ? $_POST['password'] : null;
 
-        $input = json_decode(file_get_contents("php://input"), true);
-        $username = $input['username'] ?? null;
-        $password = $input['password'] ?? null;
 
         if ($username !== null && $password !== null && $userId !== null) {
             $result = $this->createUser($userId, $name, $username, $role, $password);
@@ -72,8 +71,11 @@ class UserController {
     
                 $JwtController = new Jwt(Config::SECRET_KEY);
                 $token = $JwtController->encode($payload);
-    
-                return ['token' => $token];
+                session_start();
+                $_SESSION['token'] = $token;
+                $_SESSION['email'] = $username;
+                header("Location: dashboard.php");
+                die();
             } else {
                 return ['error' => 'Credenciales inválidas.'];
             }
