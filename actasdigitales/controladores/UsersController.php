@@ -71,11 +71,19 @@ class UserController {
     
                 $JwtController = new Jwt(Config::SECRET_KEY);
                 $token = $JwtController->encode($payload);
+<<<<<<< HEAD
                 session_start();
                 $_SESSION['token'] = $token;
                 $_SESSION['email'] = $username;
                 header("Location: dashboard.php");
                 die();
+=======
+    
+                session_start();
+                $_SESSION['email'] = $username;
+                $_SESSION['token'] = $token;
+                header('Location: ./dashboard.php');
+>>>>>>> 72c8765deac3028dd933444e10b8ebb2fb0b2e48
             } else {
                 return ['error' => 'Credenciales inválidas.'];
             }
