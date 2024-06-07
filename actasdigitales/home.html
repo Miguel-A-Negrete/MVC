@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./CSS/style.css">
     <link rel="stylesheet" href="./CSS/styleHome.css">
-    <title>Iniciar Sesion</title>
+    <title>Iniciar Sesión</title>
 </head>
 <body>
     <section class="container">
         <header>Iniciar sesión</header>
-        <form id="loginForm" class="form" method="post" action="index.php?route=users">
+        <form id="loginForm" class="form">
             <div class="input-box">
                 <label for="username">Nombre de usuario</label>
-                <input name="username" id="username" type="text" placeholder="Ingresa tu correo electronico" required>
+                <input name="username" id="username" type="text" placeholder="Ingresa tu correo electrónico" required>
             </div>
 
             <div class="input-box">
@@ -23,7 +23,46 @@
 
             <button type="submit">Iniciar</button>
         </form>
-        <p>¿No tienes cuenta? <a href="register.html">registrate aquí</a></p>
+        <p>¿No tienes cuenta? <a href="register.html">Regístrate aquí</a></p>
     </section>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Obtenemos los valores de los campos del formulario
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Creamos un objeto con los datos del formulario
+            const data = {
+                username: username,
+                password: password
+            };
+
+            // Enviamos los datos como JSON
+            fetch('index.php?route=users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Guardamos el token en el almacenamiento local
+                    localStorage.setItem('jwt', data.token);
+                    // Redirigimos al dashboard
+                    window.location.href = 'dashboard.php';
+                } else {
+                    alert('Credenciales inválidas');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -35,7 +35,7 @@ class Jwt
                 $matches
             ) !== 1
         ) {
-
+            error_log("Invalid token format: $token");
             throw new InvalidArgumentException("invalid token format");
         }
 

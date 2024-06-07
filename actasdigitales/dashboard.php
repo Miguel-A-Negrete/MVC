@@ -1,26 +1,38 @@
 <?php
-include_once './conexion/DB.php';
-include_once './conexion/Jwt.php';
-include_once './controladores/RecordsController.php';
-include_once './modelos/RecordsModel.php';
-include_once './controladores/MeetingsController.php';
-include_once './modelos/MeetingsModel.php';
-include_once './controladores/UsersController.php';
-include_once './modelos/UsersModel.php';
+require_once './modelos/UsersModel.php';
+require_once './modelos/RecordsModel.php';
+require_once './modelos/MeetingsModel.php';
+require_once './controladores/UsersController.php';
+require_once './controladores/RecordsController.php';
+require_once './controladores/MeetingsController.php';
+require_once './conexion/Jwt.php';
+require_once './conexion/Conexion.php';
+require_once './vendor/autoload.php';
 
-session_start();
+use \Firebase\JWT\JWT;
 
-if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
-    $token = $_SESSION['token'];
-    $JwtController = new Jwt(Config::SECRET_KEY);
+// Verificar la presencia del token en la cabecera HTTP
+if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    header('Location: home.html');
+    exit();
+}
 
-    try {
-        $payload = $JwtController->decode($token);
-    } catch (Exception $e) {
-        header("Location: home.html");
-        exit();
-    }
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+list($jwt) = sscanf($authHeader, 'Bearer %s');
 
+if (!$jwt) {
+    header('Location: home.html');
+    exit();
+}
+
+// Verificar y decodificar el token
+try {
+    $decoded = JWT::decode($jwt, Config::SECRET_KEY, array('HS256'));
+    // Si el token es válido, continuar con la ejecución del script
+} catch (Exception $e) {
+    header('Location: home.html');
+    exit();
+}
     $con = DB::getInstance();
     $recordController = new RecordController(new RecordModel($con));
     $meetingController = new MeetingController(new MeetingModel($con));
@@ -216,9 +228,3 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
     </body>
 
     </html>
-
-    <?php
-} else {
-    header("Location: home.html");
-}
-?>
