@@ -42,26 +42,32 @@ class UserController {
     private function handlePOST() {
         $input = json_decode(file_get_contents('php://input'), true);
 
-        $username = $input['username'] ?? null;
-        $password = $input['password'] ?? null;
+        $username = filter_var($input['username'] ?? null, FILTER_SANITIZE_STRING);
+        $password = filter_var($input['password'] ?? null, FILTER_SANITIZE_STRING);
+
 
         if ($username !== null && $password !== null) {
-            $result = $this->getUserApprobation($username, $password);
-            if ($result) {
-                $id = $this->getUserID($username);
-                $user = $this->getUserByID($id['id_user']);
-                
-                $payload = [
-                    "id" => $id['id_user'],
-                    "name" => $user["name"]
-                ];
-
-                $JwtController = new Jwt(Config::SECRET_KEY);
-                $token = $JwtController->encode($payload);
-
-                return ['success' => true, 'token' => $token];
-            } else {
-                return ['error' => 'Credenciales inválidas.'];
+            try{
+                $result = $this->getUserApprobation($username, $password);
+                if ($result) {
+                    $id = $this->getUserID($username);
+                    
+                    $payload = [
+                        "id" => $id['id_user'],
+                        "exp" => time() + (60*60)
+                    ];
+    
+                    $JwtController = new Jwt(Config::SECRET_KEY);
+                    $token = $JwtController->encode($payload);
+    
+                    return ['token' => $token, 'success' => true];
+                } else {
+                    return ['error' => 'Credenciales inválidas.'];
+                }
+            } catch(PDOException $e){
+                return ['error' => 'Error al conectar con la base de datos'];
+            } catch (Exception $e){
+                return ['error' => $e->getMessage()];
             }
         } else {
             return ['error' => 'Username y password son requeridos.'];

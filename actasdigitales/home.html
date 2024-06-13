@@ -13,12 +13,12 @@
         <form id="loginForm" class="form">
             <div class="input-box">
                 <label for="username">Nombre de usuario</label>
-                <input name="username" id="username" type="text" placeholder="Ingresa tu correo electrónico" required>
+                <input name="username" id="username" type="text" placeholder="Ingresa tu correo electrónico">
             </div>
 
             <div class="input-box">
                 <label for="password">Contraseña</label>
-                <input type="password" name="password" id="password" placeholder="* * * * * * * * *" required>
+                <input type="password" name="password" id="password" placeholder="* * * * * * * * *">
             </div>
 
             <button type="submit">Iniciar</button>
@@ -33,6 +33,11 @@
             // Obtenemos los valores de los campos del formulario
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            
+            if(username=== "" || password === ""){
+                alert('Todos los campos son obligtorios.');
+                return;
+            }
 
             // Creamos un objeto con los datos del formulario
             const data = {
@@ -61,6 +66,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+                alert('Ocurrió un error al iniciar sasión. Por favor, intenta nuevamente.')
             });
         });
     </script>

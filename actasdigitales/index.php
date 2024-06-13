@@ -31,40 +31,18 @@ function createControllers($con, $controllerNames) {
     return $instances;
 }
 
-function checkJWT() {
-    if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
-        return false;
-    }
-
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-    list($jwt) = sscanf($authHeader, 'Bearer %s');
-
-    if (!$jwt) {
-        return false;
-    }
-
-    try {
-        $JwtController = new Jwt(Config::SECRET_KEY);
-        $payload = $JwtController->decode($jwt);
-        return $payload;
-    } catch (Exception $e) {
-        return false;
-    }
-}
-
 $controllerNames = ['User', 'Record', 'Meeting'];
 $controllers = createControllers($con, $controllerNames);
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-$route = $_GET['route'] ?? '';
-
-if (in_array($route, $controllerNames) && !checkJWT()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit();
+if (!in_array($requestMethod, ['GET', 'POST'])) {
+    http_response_code(405); // Método no permitido
+    echo json_encode(['error' => 'Método no permitido']);
+    exit;
 }
 
+$route = $_GET['route'] ?? '';
 $response = null;
 try {
     switch ($route) {
@@ -78,6 +56,7 @@ try {
             $response = $controllers['Meeting']->handleRequest($requestMethod);
             break;
         default:
+            http_response_code(404);
             $response = ['error' => 'Ruta no válida'];
             break;
     }

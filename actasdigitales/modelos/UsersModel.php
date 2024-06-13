@@ -28,17 +28,17 @@ class UserModel {
         return $stmt->fetch(PDO::FETCH_ASSOC); 
     }
 
-    public function getSearchUser(){
+    public function getSearchUser() {
         if (isset($_GET['query'])) {
-        $query = $_GET['query'];
-        $con = DB::getInstance();
-        $stmt = $con->prepare("SELECT id, name, email FROM {$this->tableName} WHERE name LIKE ? OR email LIKE ?");
-        $stmt->execute(['%' . $query . '%', '%' . $query . '%']);
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $query = htmlspecialchars($_GET['query']);
+            $stmt = $this->pdo->prepare("SELECT id_user, name, email FROM {$this->tableName} WHERE name LIKE ? OR email LIKE ?");
+            $stmt->execute(['%' . $query . '%', '%' . $query . '%']);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $results;
+        }
+        return ['error' => 'No se proporcionó una consulta'];
+    }
     
-        echo json_encode($results);
-    }
-    }
     
 
     public function getUserApprobation($email, $password) {
