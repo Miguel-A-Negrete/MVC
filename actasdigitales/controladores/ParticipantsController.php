@@ -36,7 +36,7 @@ class ParticipantController {
     }
 
     private function handlePOST() {
-        $result = $this->createPaticipantsMeeting($meeting_id, $user_id, $role);
+        $result = $this->createParticipantsMeeting($meeting_id, $user_id, $role);
     
         if ($result > 0) {
             return ['success' => true, 'message' => 'Registro agregado exitosamente.'];

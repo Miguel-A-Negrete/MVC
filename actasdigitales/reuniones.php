@@ -17,7 +17,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
         header("Location: home.html");
         exit();
     }
-    $con = DB::getInstance();
+    $con = new DB;
     $meetingController = new MeetingController(new MeetingModel($con));
     $participantController = new ParticipantController(new ParticipantModel($con));
     ?>

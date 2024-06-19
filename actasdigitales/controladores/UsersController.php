@@ -1,124 +1,126 @@
 <?php
-require_once './conexion/Conexion.php';
-require_once './conexion/Jwt.php';
 
-class UserController {
-    private $userModel;
+    require_once '../modelos/UsersModel.php';
+    require_once '../conexion/session_helper.php';
+    require_once '../conexion/Conexion.php';
+    require_once '../conexion/Jwt.php';
 
-    public function __construct($userModel) {
-        $this->userModel = $userModel;
+    class Users {
+
+        private $userModel;
+        private $jwt;
+
+        
+        public function __construct(){
+            $this->userModel = new UserModel;
+            $this->jwt = new Jwt(Config::SECRET_KEY);
+        }
+
+        public function register(){
+            //Process form
+            
+            //Sanitize POST data
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            //Init data
+            $data = [
+                'name' => trim($_POST['name']),
+                'email' => trim($_POST['email']),
+                'id_user' => trim($_POST['id_user']),
+                'password_hash' => trim($_POST['password_hash']),
+                'rol' => trim($_POST['rol'])
+            ];
+
+            //Validate inputs
+            if(empty($data['name']) || empty($data['email']) || empty($data['id_user']) || 
+            empty($data['password_hash'])){
+                flash("register", "Please fill out all inputs");
+                redirect("../register.php");
+            }
+
+            if(!preg_match("/^[0-9]*$/", $data['id_user'])){
+                flash("register", "Invalid id");
+                redirect("../register.php");
+            }
+
+            if(!filter_var($data['email'], FILTER_VALIDATE_EMAIL)){
+                flash("register", "Invalid email");
+                redirect("../register.php");
+            }
+
+            if(strlen($data['password_hash']) < 6){
+                flash("register", "Invalid password");
+                redirect("../register.php");
+            }
+
+            //User with the same email or password already exists
+            if($this->userModel->findUserByEmailOrUsername($data['email'], $data['name'])){
+                flash("register", "Username or email already taken");
+                redirect("../register.php");
+            }
+
+            //Passed all validation checks.
+            //Now going to hash password
+            $data['password_hash'] = password_hash($data['password_hash'], PASSWORD_DEFAULT);
+
+            //Register User
+            if($this->userModel->register($data)){
+                redirect("../login.php");
+            }else{
+                die("Something went wrong");
+            }
+        }
+
+        public function login(){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $data = [
+                'email' => trim($_POST['email']),
+                'password_hash' => trim($_POST['password_hash'])
+            ];
+        
+            if (empty($data['email']) || empty($data['password_hash'])) {
+                flash("login", "Please fill out all inputs");
+                header("location: ../login.php");
+                exit();
+            }
+        
+            $user = $this->userModel->login($data['email'], $data['password_hash']);
+
+    if (!$user) {
+        http_response_code(401); // Unauthorized
+        echo json_encode(array("message" => "Invalid credentials"));
+        exit();
     }
 
-    public function handleRequest($method) {
-        switch ($method) {
-            case 'GET':
-                return $this->handleGET();
-            case 'POST':
-                return $this->handlePOST();
-            case 'PUT':
-                return $this->handlePUT();
-            case 'DELETE':
-                return $this->handleDELETE();
+    $payload = [
+        "id_user" => $user->id_user,
+        "name" => $user->name, // Include name in JWT payload
+        "email" => $user->email,
+    ];
+    $token = $this->jwt->encode($payload);
+
+    http_response_code(200); // OK
+    echo json_encode(array("token" => $token));
+    }
+    }
+
+    $init = new Users;
+
+    //Ensure that user is sending a post request
+    if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        switch($_POST['type']){
+            case 'register':
+                $init->register();
+                break;
+            case 'login':
+                $init->login();
+                break;
             default:
-                return ['error' => 'Método no permitido'];
+            redirect("../index.php");
         }
-    }
-
-    private function handleGET() {
-        try {
-            if (isset($_GET['id_user'])) {
-                $userId = $_GET['id_user'];
-                $user = $this->getUserByID($userId);
-                return $user;
-            } else {
-                // Obtener todos los usuarios
-                return $this->getAllUsers();
-            }
-        } catch (Exception $e) {
-            return ['error' => $e->getMessage()];
+        
+    }else{
+            redirect("../index.php");
         }
-    }
 
-    private function handlePOST() {
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        $username = filter_var($input['username'] ?? null, FILTER_SANITIZE_STRING);
-        $password = filter_var($input['password'] ?? null, FILTER_SANITIZE_STRING);
-
-
-        if ($username !== null && $password !== null) {
-            try{
-                $result = $this->getUserApprobation($username, $password);
-                if ($result) {
-                    $id = $this->getUserID($username);
-                    
-                    $payload = [
-                        "id" => $id['id_user'],
-                        "exp" => time() + (60*60)
-                    ];
     
-                    $JwtController = new Jwt(Config::SECRET_KEY);
-                    $token = $JwtController->encode($payload);
-    
-                    return ['token' => $token, 'success' => true];
-                } else {
-                    return ['error' => 'Credenciales inválidas.'];
-                }
-            } catch(PDOException $e){
-                return ['error' => 'Error al conectar con la base de datos'];
-            } catch (Exception $e){
-                return ['error' => $e->getMessage()];
-            }
-        } else {
-            return ['error' => 'Username y password son requeridos.'];
-        }
-    }
-
-    private function handlePUT() {
-        parse_str(file_get_contents("php://input"), $_PUT);
-        $id = $_PUT['id_user'] ?? null;
-        $name = $_PUT['name'] ?? null;
-        $email = $_PUT['email'] ?? null;
-        $role = $_PUT['rol'] ?? null;
-        $password = $_PUT['password'] ?? null;
-
-        $result = $this->updateUser($id, $name, $email, $role, $password);
-        return ['success' => $result > 0];
-    }
-
-    private function handleDELETE() {
-        parse_str(file_get_contents("php://input"), $_DELETE);
-        $id = $_DELETE['id_user'] ?? null;
-        $result = $this->deleteUser($id);
-        return ['success' => $result > 0];
-    }
-
-    private function createUser($id, $name, $email, $role, $password) {
-        return $this->userModel->createUser($id, $name, $email, $role, $password);
-    }
-
-    public function getAllUsers() {
-        return $this->userModel->getAllUsers();
-    }
-
-    public function getUserByID($id) {
-        return $this->userModel->getUserByID($id);
-    }
-
-    private function getUserApprobation($email, $password) {
-        return $this->userModel->getUserApprobation($email, $password);
-    }
-
-    public function getUserID($email) {
-        return $this->userModel->getUserID($email);
-    }
-
-    private function updateUser($id, $name, $email, $role, $password) {
-        return $this->userModel->updateUser($id, $name, $email, $role, $password);
-    }
-
-    private function deleteUser($id) {
-        return $this->userModel->deleteUser($id);
-    }
-}
-?>

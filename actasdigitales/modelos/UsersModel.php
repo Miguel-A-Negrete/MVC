@@ -1,97 +1,63 @@
 <?php
+require_once "../conexion/DB.php";
 class UserModel {
     private $pdo;
-    private $tableName = 'users';
 
-    public function __construct($pdo) {
-        $this->pdo = $pdo;
+
+    public function __construct(){
+        $this->pdo = new DB;
     }
 
-    public function createUser($id, $name, $email, $role, $password) {
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $query = "INSERT INTO {$this->tableName} (id_user,name, email, rol, password_hash) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$id, $name, $email, $role, $hashedPassword]);
-        return $stmt->rowCount(); 
-    }
-    
-    public function getAllUsers() {
-        $query = "SELECT id_user, name, email, rol,password_hash FROM {$this->tableName}";
-        $stmt = $this->pdo->query($query);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+     #Encuentra usuario por email o nombre
+     public function findUserByEmailOrUsername($email, $name){
+        $this->pdo->query('SELECT * FROM users WHERE name = :name OR email = :email');
+        $this->pdo->bind(':name', $name);
+        $this->pdo->bind(':email', $email);
 
-    public function getUserByID($id) {
-        $query = "SELECT id_user, name, email, rol,password_hash FROM {$this->tableName} WHERE id_user = ?";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC); 
-    }
+        $row = $this->pdo->single();
 
-    public function getSearchUser() {
-        if (isset($_GET['query'])) {
-            $query = htmlspecialchars($_GET['query']);
-            $stmt = $this->pdo->prepare("SELECT id_user, name, email FROM {$this->tableName} WHERE name LIKE ? OR email LIKE ?");
-            $stmt->execute(['%' . $query . '%', '%' . $query . '%']);
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $results;
+        if($this->pdo->rowCount() > 0){
+            return $row;
+        }else{
+            return false;
         }
-        return ['error' => 'No se proporcionó una consulta'];
     }
-    
-    
 
-    public function getUserApprobation($email, $password) {
-        // Consulta solo el hash de la contraseña asociado con el correo electrónico
-        $query = "SELECT password_hash FROM {$this->tableName} WHERE email = ?";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$email]);
-        
-        // Verifica si el correo electrónico existe
-        if ($stmt->rowCount() > 0) {
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            // Usa password_verify para comparar la contraseña proporcionada con el hash almacenado
-            if (password_verify($password, $user['password_hash'])) {
-                return true; // Las credenciales son válidas
-            }
+    
+     #Registro de usuarios
+    public function register($data){
+        $this->pdo->query('INSERT INTO users (id_user, name, email, rol, password_hash) VALUES (:id, :name, :email, :rol, :password_hash)');
+        $this->pdo->bind(':id', $data['id_user']);
+        $this->pdo->bind(':name', $data['name']);
+        $this->pdo->bind(':email', $data['email']);
+        $this->pdo->bind(':rol', $data['rol']);
+        $this->pdo->bind(':password_hash', $data['password_hash']);
+
+        if($this->pdo->execute()){
+            return true;
+        }else{
+            return false;
         }
-    
-        return false; // Las credenciales son inválidas
-    }
+    }  
 
-    public function getUserID($email){
-        $query = "SELECT id_user FROM {$this->tableName} WHERE email = ?";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC); 
-    }
-    
+    #Login
 
-    public function updateUser($id, $name, $email, $role, $password) {
-        $hashedPassword = ($password != null) ? password_hash($password, PASSWORD_BCRYPT) : null;
+    public function login($email, $password_hash){
+        $row = $this->findUserByEmailOrUsername($email, $email);
 
-        $query = "UPDATE users SET name = ?, email = ?, rol = ?";
-        $params = [$name, $email, $role];
+        if($row == false) return false;
 
-        if ($hashedPassword != null) {
-            $query .= ", password_hash = ?";
-            $params[] = $hashedPassword;
+        $hashedPassword = $row->password_hash;
+        if(password_verify($password_hash, $hashedPassword)){
+            return $row;
+        }else{
+            return false;
         }
-
-        $query .= " WHERE id_user = ?";
-        $params[] = $id;
-
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute($params);
-        return $stmt->rowCount();
     }
 
-    public function deleteUser($id) {
-        $query = "DELETE FROM users WHERE id_user = ?";
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute([$id]);
-        return $stmt->rowCount(); 
-    }
+
+   
 }
+
+    
 ?>

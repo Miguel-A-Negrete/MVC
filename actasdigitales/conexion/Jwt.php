@@ -1,15 +1,14 @@
 <?php
+
 class Jwt
 {
 
     public function __construct(private string $key)
     {
-
     }
 
     public function encode(array $payload): string
     {
-
         $header = json_encode([
             "alg" => "HS256",
             "typ" => "JWT"
@@ -24,8 +23,6 @@ class Jwt
         return $header . "." . $payload . "." . $signature;
     }
 
-
-   
     public function decode(string $token): array
     {
         if (
@@ -49,9 +46,7 @@ class Jwt
         $signature_from_token = $this->base64URLDecode($matches["signature"]);
 
         if (!hash_equals($signature, $signature_from_token)) {
-
-            // throw new Exception("signature doesn't match");
-            throw new InvalidSignatureException;
+            throw new InvalidSignatureException("signature doesn't match");
         }
 
         $payload = json_decode($this->base64URLDecode($matches["payload"]), true);
@@ -59,10 +54,8 @@ class Jwt
         return $payload;
     }
 
-  
     private function base64URLEncode(string $text): string
     {
-
         return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($text));
     }
 
@@ -76,7 +69,13 @@ class Jwt
             )
         );
     }
-
-  
 }
+
+class InvalidSignatureException extends Exception
+{
+    public function __construct($message = "Invalid signature", $code = 0, Exception $previous = null) {
+        parent::__construct($message, $code, $previous);
+    }
+}
+
 ?>
